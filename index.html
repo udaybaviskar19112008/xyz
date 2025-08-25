@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-dark: #0056b3;
+      --secondary-color: #6c757d;
+      --background-light: #f8f9fa;
+      --white: #ffffff;
+      --text-color: #333;
+      --border-color: #dee2e6;
+      --input-border: #ced4da;
+      --box-shadow-light: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--background-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .login-container {
+      background-color: var(--white);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px var(--box-shadow-light);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-header {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--border-color);
+      position: relative;
+    }
+
+    .login-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 50%;
+      height: 2px;
+      background-color: var(--primary-color);
+      transition: left 0.3s ease, background-color 0.3s ease;
+    }
+
+    .login-header.recruiter-active::after {
+      left: 50%;
+      background-color: #28a745;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 15px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--secondary-color);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .tab-button.active {
+      color: var(--primary-color);
+    }
+    .tab-button[data-tab="recruiter"].active {
+      color: #28a745;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      outline: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    }
+
+    button[type="submit"]:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .login-form { display: none; padding-top: 20px; }
+    .login-form.active { display: block; }
+
+    /* Student sub-tabs */
+    .student-sub-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .student-sub-tab-button {
+      flex: 1;
+      padding: 10px 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--secondary-color);
+      background-color: var(--background-light);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .student-sub-tab-button.active {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+    }
+
+    .student-sub-tab-button:first-child {
+      border-right: 1px solid var(--border-color);
+    }
+
+    .student-sub-form { display: none; }
+    .student-sub-form.active { display: block; }
+
+    .login-link-toggle {
+      margin-top: 20px;
+      font-size: 15px;
+    }
+
+    .login-link-toggle a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .login-link-toggle a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Recruiter specific */
+    .recruiter-login-form h2 { color: #28a745; }
+    .recruiter-login-form button[type="submit"] {
+      background-color: #28a745;
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    }
+    .recruiter-login-form button[type="submit"]:hover {
+      background-color: #218838;
+    }
+    .recruiter-login-form input:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .recruiter-login-form .login-link-toggle a {
+      color: #28a745;
+    }
+    .recruiter-login-form .login-link-toggle a:hover {
+      color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <button class="tab-button active" data-tab="student">Student</button>
+      <button class="tab-button" data-tab="recruiter">Recruiter</button>
+    </div>
+
+    <!-- Student Form -->
+    <div id="student-login-form" class="login-form active">
+      <h2>Student Access</h2>
+      <div class="student-sub-tabs">
+        <button class="student-sub-tab-button active" data-sub-tab="signIn">Sign In</button>
+        <button class="student-sub-tab-button" data-sub-tab="createAccount">Create Account</button>
+      </div>
+
+      <!-- Sign In -->
+      <form id="studentSignInForm" class="student-sub-form active">
+        <div class="form-group">
+          <label for="studentEmail">Email:</label>
+          <input type="email" id="studentEmail" name="studentEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="studentPassword">Password:</label>
+          <input type="password" id="studentPassword" name="studentPassword" required>
+        </div>
+        <button type="submit">Student Sign In</button>
+      </form>
+
+      <!-- Create Account -->
+      <form id="studentCreateAccountForm" class="student-sub-form">
+        <div class="form-group">
+          <label for="newStudentName">Full Name:</label>
+          <input type="text" id="newStudentName" name="newStudentName" required>
+        </div>
+        <div class="form-group">
+          <label for="newStudentEmail">Email:</label>
+          <input type="email" id="newStudentEmail" name="newStudentEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="newStudentPassword">Password:</label>
+          <input type="password" id="newStudentPassword" name="newStudentPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmStudentPassword">Confirm Password:</label>
+          <input type="password" id="confirmStudentPassword" name="confirmStudentPassword" required>
+        </div>
+        <button type="submit">Create New Student Account</button>
+      </form>
+    </div>
+
+    <!-- Recruiter Form -->
+    <div id="recruiter-login-form" class="login-form recruiter-login-form">
+      <h2>Recruiter Access</h2>
+      <form id="recruiterForm">
+        <div class="form-group">
+          <label for="recruiterEmail">Email:</label>
+          <input type="email" id="recruiterEmail" name="recruiterEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="recruiterPassword">Password:</label>
+          <input type="password" id="recruiterPassword" name="recruiterPassword" required>
+        </div>
+        <button type="submit">Recruiter Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

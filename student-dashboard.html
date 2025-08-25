@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <style>
+        /* Specific styles for the student dashboard page */
+        :root {
+            --primary-color-student: #2c3e50; /* Dark blue/grey for professional feel */
+            --accent-color-student: #3498db; /* Bright blue for accents */
+            --background-light: #ecf0f1; /* Light grey background */
+            --text-color-dark: #3a3a3a;
+            --text-color-light: #666;
+            --border-color: #ddd;
+            --white: #ffffff;
+            --box-shadow-subtle: rgba(0, 0, 0, 0.08);
+            --box-shadow-medium: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-light);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            padding: 40px 20px; /* Add some padding around the container */
+            box-sizing: border-box;
+        }
+
+        .dashboard-container {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--box-shadow-medium);
+            width: 100%;
+            max-width: 1100px; /* Wider for more content */
+            text-align: left;
+            animation: fadeInScale 0.8s ease-out forwards;
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Two columns: sidebar and main content */
+            gap: 30px; /* Space between grid items */
+            position: relative; /* For modal positioning */
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .sidebar {
+            background-color: var(--primary-color-student);
+            color: var(--white);
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--box-shadow-subtle);
+            position: sticky; /* Stick to top when scrolling */
+            top: 40px; /* Offset from top */
+            align-self: start; /* Align to the start of its grid area */
+        }
+
+        .sidebar h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .sidebar .profile-info p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .sidebar .profile-info p strong {
+            display: block;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+        }
+
+        .sidebar .profile-info .email {
+            word-break: break-all; /* Break long emails */
+        }
+
+        .sidebar button {
+            background-color: var(--accent-color-student);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar button:hover {
+            background-color: #2980b9;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .dashboard-section {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--box-shadow-subtle);
+            border: 1px solid var(--border-color);
+        }
+
+        .dashboard-section h3 {
+            color: var(--primary-color-student);
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-color-student);
+            padding-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-section h3 .icon {
+            font-size: 28px;
+            color: var(--accent-color-student);
+        }
+
+        /* Resume Upload specific styles */
+        .resume-upload-box {
+            border: 2px dashed var(--accent-color-student);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f7f9fa;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .resume-upload-box:hover {
+            border-color: var(--primary-color-student);
+            background-color: #eff3f5;
+        }
+
+        .resume-upload-box label {
+            display: block;
+            margin-bottom: 20px;
+            color: var(--text-color-dark);
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .resume-upload-box input[type="file"] {
+            display: none;
+        }
+
+        .file-input-button {
+            display: inline-block;
+            background-color: var(--accent-color-student);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .file-input-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .uploaded-file-info {
+            margin-top: 20px;
+            font-size: 15px;
+            color: var(--text-color-light);
+        }
+
+        .uploaded-file-info strong {
+            color: var(--primary-color-student);
+        }
+
+        .uploaded-file-info .status-icon {
+            margin-left: 8px;
+            font-size: 18px;
+            vertical-align: middle;
+        }
+        .uploaded-file-info .status-icon.processing { color: orange; }
+        .uploaded-file-info .status-icon.ready { color: var(--accent-color-student); }
+        .uploaded-file-info .status-icon.error { color: #dc3545; }
+
+
+        .job-recommendation-list .job-item {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .job-recommendation-list .job-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .job-recommendation-list .job-item h4 {
+            color: var(--primary-color-student);
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .job-recommendation-list .job-item p {
+            font-size: 15px;
+            margin-bottom: 5px;
+            color: var(--text-color-dark);
+        }
+        .job-recommendation-list .job-item .company {
+            font-weight: 600;
+            color: var(--accent-color-student);
+        }
+        .job-recommendation-list .job-item .location, .job-recommendation-list .job-item .salary {
+            font-style: italic;
+            color: var(--text-color-light);
+        }
+        .job-recommendation-list .job-item .apply-link {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: var(--accent-color-student);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        .job-recommendation-list .job-item .apply-link:hover {
+            background-color: #2980b9;
+        }
+
+        /* Skills section */
+        .skills-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .skills-input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 15px;
+        }
+        .skills-input-group button {
+            background-color: var(--accent-color-student);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .skills-input-group button:hover {
+            background-color: #2980b9;
+        }
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .skills-list .skill-tag {
+            background-color: var(--primary-color-student);
+            color: white;
+            padding: 7px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .skills-list .skill-tag .remove-skill {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        .skills-list .skill-tag .remove-skill:hover {
+            opacity: 1;
+        }
+
+        .application-history-list .application-item {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .application-history-list .application-item .app-details {
+            font-size: 15px;
+        }
+        .application-history-list .application-item .app-details strong {
+            color: var(--primary-color-student);
+            font-size: 16px;
+        }
+        .application-history-list .application-item .app-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+        .application-history-list .application-item .app-status.applied { background-color: #6c757d; }
+        .application-history-list .application-item .app-status.review { background-color: orange; }
+        .application-history-list .application-item .app-status.interview { background-color: var(--accent-color-student); }
+        .application-history-list .application-item .app-status.rejected { background-color: #dc3545; }
+        .application-history-list .application-item .app-status.offer { background-color: #28a745; }
+
+
+        .logout-link {
+            display: block;
+            margin-top: 30px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .logout-link a {
+            color: #d32f2f; /* Red for logout */
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .logout-link a:hover {
+            color: #b71c1c;
+            text-decoration: underline;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* --- Modal for Edit Profile --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-content h3 {
+            color: var(--primary-color-student);
+            font-size: 26px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--accent-color-student);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-content .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color-dark);
+        }
+
+        .modal-content .form-group input[type="text"],
+        .modal-content .form-group input[type="email"],
+        .modal-content .form-group textarea {
+            width: calc(100% - 22px); /* account for padding and border */
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .modal-content .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-buttons .save-button {
+            background-color: var(--accent-color-student);
+            color: white;
+        }
+
+        .modal-buttons .save-button:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-buttons .cancel-button {
+            background-color: #e0e0e0;
+            color: var(--text-color-dark);
+        }
+
+        .modal-buttons .cancel-button:hover {
+            background-color: #c9c9c9;
+        }
+
+        /* Close button for modal */
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-color-light);
+            line-height: 1;
+        }
+        .modal-close-button:hover {
+            color: var(--text-color-dark);
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr; /* Stack columns on smaller screens */
+                padding: 30px 15px;
+                gap: 20px;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+            .dashboard-section h3 {
+                font-size: 22px;
+            }
+            .job-recommendation-list .job-item h4 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2>Student Profile</h2>
+            <div class="profile-info">
+                <p><strong>Name</strong> <span id="profileName">John Doe</span></p>
+                <p><strong>Email</strong> <span class="email" id="profileEmail">john.doe@example.com</span></p>
+                <p><strong>Major</strong> <span id="profileMajor">Computer Science</span></p>
+                <p><strong>Current Status</strong> <span id="profileStatus">Actively Looking</span></p>
+            </div>
+            <button id="editProfileButton">Edit Profile</button>
+            <div class="logout-link">
+                <a href="/">Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="dashboard-section resume-section">
+                <h3><span class="icon">📄</span> Resume Management</h3>
+                <div class="resume-upload-box">
+                    <form id="resumeUploadForm">
+                        <label for="studentResumeInput">Drag & Drop your resume here or click to browse</label>
+                        <input type="file" id="studentResumeInput" name="studentResume" accept=".pdf,.doc,.docx,.txt" required>
+                        <label for="studentResumeInput" class="file-input-button">Upload/Update Resume</label>
+                        <div class="uploaded-file-info" id="currentResumeInfo">
+                            <p>No resume uploaded yet.</p>
+                        </div>
+                        <button type="submit" class="file-input-button" id="processResumeButton" style="display: none; background-color: var(--primary-color-student);">Process My Resume</button>
+                    </form>
+                    <div id="resumeMessage" class="message"></div>
+                </div>
+            </section>
+
+            <section class="dashboard-section job-recommendation-section">
+                <h3><span class="icon">✨</span> Recommended Jobs</h3>
+                <p>Based on your resume and profile, here are some jobs that might be a great fit for you!</p>
+                <div class="job-recommendation-list" id="jobRecommendationList">
+                    <div class="job-item">
+                        <h4>Software Engineer</h4>
+                        <p class="company">Tech Innovators Inc.</p>
+                        <p class="location">Bengaluru, India</p>
+                        <p class="salary">₹8-12 LPA</p>
+                        <a href="#" class="apply-link">Apply Now</a>
+                    </div>
+                    <div class="job-item">
+                        <h4>Data Scientist - Entry Level</h4>
+                        <p class="company">Data Insights Pvt. Ltd.</p>
+                        <p class="location">Hyderabad, India</p>
+                        <p class="salary">₹7-10 LPA</p>
+                        <a href="#" class="apply-link">Apply Now</a>
+                    </div>
+                    <div class="job-item">
+                        <h4>Junior Web Developer</h4>
+                        <p class="company">Creative Solutions Agency</p>
+                        <p class="location">Remote</p>
+                        <p class="salary">₹6-9 LPA</p>
+                        <a href="#" class="apply-link">Apply Now</a>
+                    </div>
+                    <p id="noRecommendations" style="display: none; text-align: center; color: var(--text-color-light);">No new recommendations at the moment. Update your resume or profile!</p>
+                </div>
+            </section>
+
+            <section class="dashboard-section skills-section">
+                <h3><span class="icon">💡</span> Skills & Interests</h3>
+                <p>Add skills to improve your job recommendations.</p>
+                <div class="skills-input-group">
+                    <input type="text" id="skillInput" placeholder="e.g., Python, Machine Learning, UI/UX">
+                    <button id="addSkillButton">Add Skill</button>
+                </div>
+                <div class="skills-list" id="skillsList">
+                    <span class="skill-tag">JavaScript <button class="remove-skill">&times;</button></span>
+                    <span class="skill-tag">React <button class="remove-skill">&times;</button></span>
+                    <span class="skill-tag">Node.js <button class="remove-skill">&times;</button></span>
+                </div>
+            </section>
+
+            <section class="dashboard-section application-history-section">
+                <h3><span class="icon">🚀</span> Application History</h3>
+                <div class="application-history-list" id="applicationHistoryList">
+                    <div class="application-item">
+                        <div class="app-details">
+                            <strong>Software Dev Intern</strong> at Global Corp.
+                            <br> <small>Applied on: 2025-07-20</small>
+                        </div>
+                        <span class="app-status applied">Applied</span>
+                    </div>
+                    <div class="application-item">
+                        <div class="app-details">
+                            <strong>AI Research Assistant</strong> at Innovate Labs
+                            <br> <small>Applied on: 2025-07-15</small>
+                        </div>
+                        <span class="app-status review">Under Review</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeModalButton">&times;</button>
+            <h3>Edit Your Profile</h3>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editName">Name:</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email:</label>
+                    <input type="email" id="editEmail" required readonly> </div>
+                <div class="form-group">
+                    <label for="editMajor">Major:</label>
+                    <input type="text" id="editMajor">
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Current Status:</label>
+                    <input type="text" id="editStatus" placeholder="e.g., Actively Looking, Student, Employed">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="cancel-button" id="cancelEditButton">Cancel</button>
+                    <button type="submit" class="save-button">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Profile Display Elements ---
+            const profileName = document.getElementById('profileName');
+            const profileEmail = document.getElementById('profileEmail');
+            const profileMajor = document.getElementById('profileMajor');
+            const profileStatus = document.getElementById('profileStatus');
+            const editProfileButton = document.getElementById('editProfileButton');
+
+            // --- Edit Profile Modal Elements ---
+            const editProfileModal = document.getElementById('editProfileModal');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const cancelEditButton = document.getElementById('cancelEditButton');
+            const editProfileForm = document.getElementById('editProfileForm');
+            const editNameInput = document.getElementById('editName');
+            const editEmailInput = document.getElementById('editEmail');
+            const editMajorInput = document.getElementById('editMajor');
+            const editStatusInput = document.getElementById('editStatus');
+
+            // --- Resume Upload Elements ---
+            const studentResumeInput = document.getElementById('studentResumeInput');
+            const currentResumeInfo = document.getElementById('currentResumeInfo');
+            const resumeUploadForm = document.getElementById('resumeUploadForm');
+            const resumeMessage = document.getElementById('resumeMessage');
+            const processResumeButton = document.getElementById('processResumeButton');
+            const resumeUploadBox = document.querySelector('.resume-upload-box'); // For drag/drop
+
+            // --- Skills & Interests Elements ---
+            const skillInput = document.getElementById('skillInput');
+            const addSkillButton = document.getElementById('addSkillButton');
+            const skillsList = document.getElementById('skillsList');
+
+            // --- State Variables (Client-side simulation of user data) ---
+            let studentData = {
+                name: "John Doe",
+                email: "john.doe@example.com",
+                major: "Computer Science",
+                status: "Actively Looking"
+            };
+            let uploadedResume = null; // To store the file object temporarily
+
+
+            // --- Functions for Profile Management ---
+            function loadProfileData() {
+                // In a real application, you'd fetch this from a backend API
+                // For this demo, we'll try to get email from localStorage
+                const storedEmail = localStorage.getItem('studentEmail');
+                if (storedEmail) {
+                    studentData.email = storedEmail;
+                }
+                // Also, you could save and load other profile data from localStorage for demo persistence
+                const savedProfile = JSON.parse(localStorage.getItem('studentProfileData'));
+                if (savedProfile) {
+                    studentData = { ...studentData, ...savedProfile }; // Merge saved data
+                }
+                updateProfileDisplay();
+            }
+
+            function updateProfileDisplay() {
+                profileName.textContent = studentData.name;
+                profileEmail.textContent = studentData.email;
+                profileMajor.textContent = studentData.major;
+                profileStatus.textContent = studentData.status;
+            }
+
+            function openEditProfileModal() {
+                editNameInput.value = studentData.name;
+                editEmailInput.value = studentData.email; // Email typically readonly
+                editMajorInput.value = studentData.major;
+                editStatusInput.value = studentData.status;
+                editProfileModal.classList.add('active');
+            }
+
+            function closeEditProfileModal() {
+                editProfileModal.classList.remove('active');
+            }
+
+            // --- Event Listeners for Profile Management ---
+            editProfileButton.addEventListener('click', openEditProfileModal);
+            closeModalButton.addEventListener('click', closeEditProfileModal);
+            cancelEditButton.addEventListener('click', closeEditProfileModal);
+
+            editProfileForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                // Update studentData object
+                studentData.name = editNameInput.value.trim();
+                // studentData.email = editEmailInput.value.trim(); // Email is readonly in this demo
+                studentData.major = editMajorInput.value.trim();
+                studentData.status = editStatusInput.value.trim();
+
+                // Save to localStorage for demo persistence
+                localStorage.setItem('studentProfileData', JSON.stringify(studentData));
+
+                updateProfileDisplay(); // Update the sidebar display
+                displayMessage(resumeMessage, 'Profile updated successfully!', 'success'); // Using resumeMessage as a general page message
+                closeEditProfileModal();
+
+                // In a real app, send this data to your backend API to save
+                console.log('Profile data saved:', studentData);
+            });
+
+            // Close modal if clicked outside (optional)
+            editProfileModal.addEventListener('click', (e) => {
+                if (e.target === editProfileModal) {
+                    closeEditProfileModal();
+                }
+            });
+
+
+            // --- Resume Upload/Update Logic ---
+            function updateResumeFileInfo() {
+                if (studentResumeInput.files.length > 0) {
+                    uploadedResume = studentResumeInput.files[0];
+                    currentResumeInfo.innerHTML = `
+                        <p>Current Resume: <strong>${uploadedResume.name}</strong> (${(uploadedResume.size / 1024 / 1024).toFixed(2)} MB)
+                        <span class="status-icon processing">⚙️ Processing...</span></p>
+                    `;
+                    processResumeButton.style.display = 'inline-block';
+                } else {
+                    currentResumeInfo.innerHTML = '<p>No resume uploaded yet.</p>';
+                    processResumeButton.style.display = 'none';
+                    uploadedResume = null;
+                }
+            }
+
+            // Event listener for file input change
+            studentResumeInput.addEventListener('change', updateResumeFileInfo);
+
+            // Drag and Drop functionality for Resume Upload
+            resumeUploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                resumeUploadBox.style.borderColor = 'var(--primary-color-student)';
+                resumeUploadBox.style.backgroundColor = '#f0f4f6';
+            });
+
+            resumeUploadBox.addEventListener('dragleave', () => {
+                resumeUploadBox.style.borderColor = 'var(--accent-color-student)';
+                resumeUploadBox.style.backgroundColor = '#f7f9fa';
+            });
+
+            resumeUploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                resumeUploadBox.style.borderColor = 'var(--accent-color-student)';
+                resumeUploadBox.style.backgroundColor = '#f7f9fa';
+
+                if (e.dataTransfer.files.length > 0) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(e.dataTransfer.files[0]);
+                    studentResumeInput.files = dataTransfer.files;
+                    updateResumeFileInfo();
+                }
+            });
+
+
+            // Simulate processing the resume (client-side for now)
+            resumeUploadForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                if (!uploadedResume) {
+                    displayMessage(resumeMessage, 'Please select a resume file to upload.', 'error');
+                    return;
+                }
+
+                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+                const maxSizeMB = 5;
+
+                if (!allowedTypes.includes(uploadedResume.type)) {
+                    displayMessage(resumeMessage, `Invalid file type. Only PDF, DOC, DOCX, or TXT are allowed.`, 'error');
+                    return;
+                }
+                if (uploadedResume.size > maxSizeMB * 1024 * 1024) {
+                    displayMessage(resumeMessage, `File size exceeds ${maxSizeMB}MB limit.`, 'error');
+                    return;
+                }
+
+                processResumeButton.disabled = true;
+                processResumeButton.textContent = 'Processing...';
+                currentResumeInfo.querySelector('.status-icon').textContent = '⚙️ Processing...';
+                currentResumeInfo.querySelector('.status-icon').className = 'status-icon processing';
+
+                displayMessage(resumeMessage, 'Uploading and processing your resume...', 'success');
+
+                // Simulate backend processing time
+                setTimeout(() => {
+                    const success = Math.random() > 0.1; // 90% chance of success
+
+                    if (success) {
+                        displayMessage(resumeMessage, 'Resume processed successfully! Job recommendations updated.', 'success');
+                        currentResumeInfo.innerHTML = `
+                            <p>Current Resume: <strong>${uploadedResume.name}</strong> (${(uploadedResume.size / 1024 / 1024).toFixed(2)} MB)
+                            <span class="status-icon ready">✅ Ready</span></p>
+                        `;
+                        // In a real app, here you'd make an API call to your backend
+                        // to send the resume and fetch actual job recommendations.
+                        // Example: fetch('/api/process-resume', { method: 'POST', body: formData });
+                    } else {
+                        displayMessage(resumeMessage, 'Failed to process resume. Please try again.', 'error');
+                        currentResumeInfo.innerHTML = `
+                            <p>Current Resume: <strong>${uploadedResume.name}</strong> (${(uploadedResume.size / 1024 / 1024).toFixed(2)} MB)
+                            <span class="status-icon error">❌ Failed</span></p>
+                        `;
+                    }
+                    processResumeButton.disabled = false;
+                    processResumeButton.textContent = 'Process My Resume';
+                    studentResumeInput.value = ''; // Clear input for re-upload
+                    uploadedResume = null;
+                }, 3000);
+            });
+
+
+            // --- Skills & Interests Logic ---
+            addSkillButton.addEventListener('click', () => {
+                const skillText = skillInput.value.trim();
+                if (skillText) {
+                    addSkillTag(skillText);
+                    skillInput.value = ''; // Clear input
+                }
+            });
+
+            skillsList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('remove-skill')) {
+                    event.target.closest('.skill-tag').remove();
+                }
+            });
+
+            function addSkillTag(skill) {
+                const skillTag = document.createElement('span');
+                skillTag.className = 'skill-tag';
+                skillTag.innerHTML = `${skill} <button class="remove-skill">&times;</button>`;
+                skillsList.appendChild(skillTag);
+                // In a real application, you'd send this to a backend to save to the user's profile
+            }
+
+            // --- Helper function for displaying messages ---
+            function displayMessage(element, message, type) {
+                element.textContent = message;
+                element.className = `message ${type}`; // Set class for styling (success/error)
+                element.style.display = 'block';
+
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+
+            // Initial calls to set up the display
+            loadProfileData(); // Load and display profile data
+            updateResumeFileInfo();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume & Job Match Predictor</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 40px; }
+        .container { background: white; padding: 20px; border-radius: 8px; width: 600px; margin: auto; }
+        textarea, input[type="file"] { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; }
+        .result { margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Resume & Job Description Match Predictor</h2>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <label>Upload Resume (PDF):</label>
+        <input type="file" name="resume_file" accept=".pdf" required>
+        
+        <label>Job Description:</label>
+        <textarea name="job" placeholder="Paste job description here" required>{{ job_text if job_text else '' }}</textarea>
+        
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prob %}
+    <div class="result">
+        <p><b>Match Probability:</b> {{ prob }}%</p>
+        <p><b>Decision:</b> {{ decision }}</p>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

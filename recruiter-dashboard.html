@@ -1,0 +1,1011 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific styles for the recruiter dashboard page (keep existing) */
+        :root {
+            --primary-color-recruiter: #007bff; /* A professional blue */
+            --primary-dark-recruiter: #0056b3;
+            --accent-color-recruiter: #28a745; /* Green for success/upload */
+            --text-color-dark: #3a3a3a;
+            --text-color-light: #777;
+            --border-color: #e1e1e1;
+            --background-light: #f8f9fa;
+            --box-shadow-light: rgba(0, 0, 0, 0.05);
+            --box-shadow-medium: rgba(0, 0, 0, 0.1);
+            --white: #ffffff;
+            --sidebar-width: 250px; /* New: Sidebar width */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e6f7ff 0%, #cceeff 100%); /* Lighter blue gradient */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for sidebar */
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color-dark);
+            line-height: 1.7;
+            padding: 20px; /* Add some padding around the whole layout */
+        }
+
+        .dashboard-wrapper { /* New: Wrapper for sidebar and main content */
+            display: flex;
+            width: 100%;
+            max-width: 1200px; /* Increased max-width to accommodate sidebar */
+            border-radius: 15px;
+            box-shadow: 0 15px 40px var(--box-shadow-medium);
+            background-color: var(--white);
+            overflow: hidden; /* Hide overflow from decorative shapes */
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color-recruiter);
+            color: var(--white);
+            padding: 30px 20px;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: var(--primary-dark-recruiter);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu a .icon { /* Placeholder for icons */
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* Main Content Area */
+        .dashboard-container {
+            flex-grow: 1; /* Take remaining space */
+            padding: 50px;
+            text-align: center;
+            animation: fadeIn 1s ease-out forwards;
+            position: relative;
+            z-index: 1; /* Ensure content is above decorative shapes */
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Decorative shapes similar to student page, but with recruiter colors */
+        .dashboard-wrapper::before { /* Apply to wrapper to avoid interfering with flex layout */
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: var(--sidebar-width); /* Adjust left position */
+            width: 120px;
+            height: 120px;
+            background-color: var(--accent-color-recruiter);
+            border-radius: 50%;
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .dashboard-wrapper::after { /* Apply to wrapper to avoid interfering with flex layout */
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: -80px;
+            width: 160px;
+            height: 160px;
+            background-color: var(--primary-color-recruiter);
+            border-radius: 50%;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        .dashboard-container h1 {
+            color: var(--primary-color-recruiter);
+            margin-bottom: 30px;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+
+        .dashboard-container > p {
+            color: var(--text-color-light);
+            margin-bottom: 40px;
+            font-size: 18px;
+            text-align: left;
+        }
+
+        .section-title {
+            color: var(--primary-color-recruiter);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .upload-section,
+        .evaluation-section,
+        .job-description-section, /* New: for job description creation */
+        .domain-resume-section { /* New: for domain resume filtering */
+            border: 2px dashed var(--primary-color-recruiter);
+            border-radius: 12px;
+            padding: 40px 30px;
+            background-color: var(--background-light);
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--box-shadow-light);
+            text-align: center;
+            display: none; /* Hidden by default, shown by JS */
+        }
+        .upload-section.active,
+        .evaluation-section.active,
+        .job-description-section.active,
+        .domain-resume-section.active {
+            display: block; /* Show active section */
+        }
+
+
+        .upload-section:hover,
+        .evaluation-section:hover,
+        .job-description-section:hover,
+        .domain-resume-section:hover {
+            border-color: var(--accent-color-recruiter);
+            background-color: #e9f5ff;
+            box-shadow: 0 8px 20px var(--box-shadow-medium);
+        }
+
+        .upload-section label,
+        .evaluation-section label,
+        .job-description-section label,
+        .domain-resume-section label {
+            display: block;
+            margin-bottom: 25px;
+            color: var(--primary-color-recruiter);
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            text-shadow: 0 1px 1px var(--box-shadow-light);
+        }
+
+        .upload-section input[type="file"],
+        .evaluation-section input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            background-color: var(--primary-color-recruiter);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 3px 8px var(--box-shadow-light);
+            margin-bottom: 15px;
+        }
+
+        .file-input-label:hover {
+            background-color: var(--primary-dark-recruiter);
+            transform: translateY(-2px);
+        }
+
+        .file-list-container {
+            margin-top: 25px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            background-color: var(--white);
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .file-list-container p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: var(--text-color-dark);
+            padding-left: 10px;
+        }
+
+        .file-list-container p strong {
+            color: var(--primary-color-recruiter);
+        }
+
+        .upload-button,
+        .evaluate-button,
+        .create-jd-button, /* New button */
+        .filter-resume-button /* New button */ {
+            background-color: var(--accent-color-recruiter);
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            width: auto;
+            margin-top: 25px;
+            box-shadow: 0 5px 10px var(--box-shadow-light);
+        }
+
+        .upload-button:hover,
+        .evaluate-button:hover,
+        .create-jd-button:hover,
+        .filter-resume-button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--box-shadow-medium);
+        }
+
+        .upload-button:active,
+        .evaluate-button:active,
+        .create-jd-button:active,
+        .filter-resume-button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px var(--box-shadow-light);
+        }
+
+        .upload-button:disabled,
+        .evaluate-button:disabled,
+        .create-jd-button:disabled,
+        .filter-resume-button:disabled {
+            background-color: #cccccc;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .logout-link {
+            display: block;
+            margin-top: 40px;
+            font-size: 16px;
+        }
+
+        .logout-link a {
+            color: #d32f2f;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .logout-link a:hover {
+            color: #b71c1c;
+            text-decoration: underline;
+        }
+
+        /* Message area for upload status */
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 2px 5px var(--box-shadow-light);
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Styles for forms */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            color: var(--text-color-dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-group textarea,
+        .form-group input[type="text"],
+        .form-group select { /* New: for domain selection */
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            min-height: 100px; /* For textarea */
+            resize: vertical;
+        }
+        .form-group input[type="text"],
+        .form-group select {
+            min-height: auto;
+            height: 40px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+
+        .prediction-result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: var(--white);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .prediction-result.select {
+            color: var(--accent-color-recruiter);
+            border: 2px solid var(--accent-color-recruiter);
+        }
+
+        .prediction-result.reject {
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        .prediction-result span {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Job Description Creation specific styles */
+        .job-description-section textarea {
+            min-height: 150px;
+        }
+        .job-description-section .message {
+            margin-top: 20px;
+        }
+
+        /* Resume by Domain specific styles */
+        .domain-resume-section ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: var(--white);
+        }
+
+        .domain-resume-section ul li {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .domain-resume-section ul li:last-child {
+            border-bottom: none;
+        }
+
+        .domain-resume-section ul li a {
+            color: var(--primary-color-recruiter);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .domain-resume-section ul li a:hover {
+            color: var(--primary-dark-recruiter);
+            text-decoration: underline;
+        }
+        .domain-resume-section .no-resumes {
+            color: var(--text-color-light);
+            font-style: italic;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <h2>Recruiter Tools</h2>
+            <nav>
+                <ul class="sidebar-menu">
+                    <li><a href="#bulkUpload" class="nav-link active" data-target="upload-section"><span class="icon">&#128447;</span> Bulk Resume Upload</a></li>
+                    <li><a href="#aiEvaluation" class="nav-link" data-target="evaluation-section"><span class="icon">&#129504;</span> AI Resume Evaluation</a></li>
+                    <li><a href="#createJobDescription" class="nav-link" data-target="job-description-section"><span class="icon">&#128221;</span> Create Job Description</a></li>
+                    <li><a href="#resumeByDomain" class="nav-link" data-target="domain-resume-section"><span class="icon">&#128187;</span> Resumes by Domain</a></li>
+                </ul>
+            </nav>
+            <div class="logout-link">
+                <a href="/">Logout</a>
+            </div>
+        </aside>
+
+        <div class="dashboard-container">
+            <h1>Recruiter Dashboard</h1>
+            <p>Welcome! Here you can manage candidate resumes and leverage AI for quick evaluations.</p>
+
+            <div class="upload-section active" id="upload-section">
+                <h2 class="section-title">Bulk Resume Upload</h2>
+                <form id="multiResumeUploadForm" class="file-input-wrapper">
+                    <label for="resumesInput">Drag & Drop multiple resumes here or click to browse</label>
+                    <input type="file" id="resumesInput" name="resumes[]" accept=".pdf,.doc,.docx,.txt" multiple required>
+                    <label for="resumesInput" class="file-input-label">Choose Files</label>
+                    <div class="file-list-container" id="fileListContainer">
+                        <p>No files selected.</p>
+                    </div>
+                    <button type="submit" class="upload-button" disabled>Upload All Resumes</button>
+                </form>
+                <div id="uploadMessage" class="message"></div>
+            </div>
+
+            <div class="evaluation-section" id="evaluation-section">
+                <h2 class="section-title">AI Resume Evaluation</h2>
+                <p>Upload a single resume and provide a job description to get an instant AI-powered decision.</p>
+                <form id="aiEvaluationForm">
+                    <div class="form-group">
+                        <label for="jobDescriptionInput">Job Description:</label>
+                        <textarea id="jobDescriptionInput" placeholder="Enter the full job description here..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="singleResumeInput">Upload Resume (PDF, DOCX, TXT):</label>
+                        <input type="file" id="singleResumeInput" name="resume_file" accept=".pdf,.doc,.docx,.txt" required>
+                        <label for="singleResumeInput" class="file-input-label">Select Resume</label>
+                        <div class="file-list-container" id="singleFileListContainer">
+                            <p>No file selected.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="evaluate-button" disabled>Evaluate Resume</button>
+                </form>
+                <div id="evaluationMessage" class="message"></div>
+                <div id="predictionResult" class="prediction-result">
+                    AI Decision: <span id="decisionText"></span>
+                </div>
+            </div>
+
+            <div class="job-description-section" id="job-description-section">
+                <h2 class="section-title">Create New Job Description</h2>
+                <p>Easily create and save job descriptions for future use or AI evaluation.</p>
+                <form id="createJobDescriptionForm">
+                    <div class="form-group">
+                        <label for="jdTitle">Job Title:</label>
+                        <input type="text" id="jdTitle" placeholder="e.g., Senior Software Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jdDomain">Domain/Category:</label>
+                        <input type="text" id="jdDomain" placeholder="e.g., IT, Marketing, Finance" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newJobDescriptionContent">Job Description Content:</label>
+                        <textarea id="newJobDescriptionContent" placeholder="Enter the detailed job description here..." required></textarea>
+                    </div>
+                    <button type="submit" class="create-jd-button">Save Job Description</button>
+                </form>
+                <div id="jdCreationMessage" class="message"></div>
+                <div class="file-list-container" id="savedJobDescriptionsList">
+                    <h3>Saved Job Descriptions:</h3>
+                    <p>No job descriptions saved yet.</p>
+                </div>
+            </div>
+
+            <div class="domain-resume-section" id="domain-resume-section">
+                <h2 class="section-title">Browse Resumes by Domain</h2>
+                <p>Select a domain to view uploaded resumes associated with it.</p>
+                <div class="form-group">
+                    <label for="domainSelect">Choose Domain:</label>
+                    <select id="domainSelect">
+                        <option value="">-- Select a Domain --</option>
+                        </select>
+                </div>
+                <button type="button" class="filter-resume-button" disabled>Show Resumes</button>
+                <div id="filteredResumesMessage" class="message"></div>
+                <ul id="filteredResumesList">
+                    <li class="no-resumes">Select a domain and click "Show Resumes" to see results.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- General Elements ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.dashboard-container > div');
+
+            // --- Bulk Upload Elements ---
+            const resumesInput = document.getElementById('resumesInput');
+            const fileListContainer = document.getElementById('fileListContainer');
+            const uploadButton = document.querySelector('.upload-button');
+            const multiResumeUploadForm = document.getElementById('multiResumeUploadForm');
+            const uploadMessage = document.getElementById('uploadMessage');
+            const bulkUploadSection = document.querySelector('.upload-section'); // For drag/drop
+
+            // --- AI Evaluation Elements ---
+            const jobDescriptionInput = document.getElementById('jobDescriptionInput');
+            const singleResumeInput = document.getElementById('singleResumeInput');
+            const singleFileListContainer = document.getElementById('singleFileListContainer');
+            const evaluateButton = document.querySelector('.evaluate-button');
+            const aiEvaluationForm = document.getElementById('aiEvaluationForm');
+            const evaluationMessage = document.getElementById('evaluationMessage');
+            const predictionResult = document.getElementById('predictionResult');
+            const decisionText = document.getElementById('decisionText');
+            const evaluationSection = document.querySelector('.evaluation-section'); // For drag/drop
+
+            // --- Create Job Description Elements ---
+            const createJobDescriptionForm = document.getElementById('createJobDescriptionForm');
+            const jdTitleInput = document.getElementById('jdTitle');
+            const jdDomainInput = document.getElementById('jdDomain');
+            const newJobDescriptionContentInput = document.getElementById('newJobDescriptionContent');
+            const createJdButton = document.querySelector('.create-jd-button');
+            const jdCreationMessage = document.getElementById('jdCreationMessage');
+            const savedJobDescriptionsList = document.getElementById('savedJobDescriptionsList');
+
+            // --- Resumes by Domain Elements ---
+            const domainSelect = document.getElementById('domainSelect');
+            const filterResumeButton = document.querySelector('.filter-resume-button');
+            const filteredResumesList = document.getElementById('filteredResumesList');
+            const filteredResumesMessage = document.getElementById('filteredResumesMessage');
+
+            // --- Data Storage (for demonstration purposes, replace with backend) ---
+            let uploadedResumes = []; // Stores {name, domain, content, fileObject}
+            let savedJobDescriptions = []; // Stores {title, domain, content}
+
+            // --- Navigation Logic ---
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.dataset.target;
+
+                    // Remove 'active' from all links and sections
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    sections.forEach(section => section.classList.remove('active'));
+
+                    // Add 'active' to the clicked link and target section
+                    link.classList.add('active');
+                    document.getElementById(targetId).classList.add('active');
+
+                    // Update URL hash
+                    history.pushState(null, '', link.href);
+
+                    // Clear messages when switching sections
+                    hideAllMessages();
+                    predictionResult.style.display = 'none';
+
+                    // Re-render domain select and filtered resumes if switching to domain section
+                    if (targetId === 'domain-resume-section') {
+                        populateDomainSelect();
+                        filterResumeButton.disabled = true; // Disable until domain is selected
+                        filteredResumesList.innerHTML = '<li class="no-resumes">Select a domain and click "Show Resumes" to see results.</li>';
+                    }
+                });
+            });
+
+            // Handle initial load based on URL hash
+            const initialHash = window.location.hash.replace('#', '');
+            if (initialHash) {
+                const initialLink = document.querySelector(`.nav-link[data-target="${initialHash}"]`);
+                if (initialLink) {
+                    initialLink.click();
+                } else {
+                    // Default to bulk upload if hash is invalid
+                    document.querySelector('.nav-link[data-target="upload-section"]').click();
+                }
+            } else {
+                // Default to bulk upload if no hash
+                document.querySelector('.nav-link[data-target="upload-section"]').click();
+            }
+
+            function hideAllMessages() {
+                document.querySelectorAll('.message').forEach(msg => {
+                    msg.style.display = 'none';
+                    msg.textContent = '';
+                });
+            }
+
+            // --- Function to update the displayed list of files for BULK UPLOAD ---
+            function updateBulkFileList() {
+                fileListContainer.innerHTML = ''; // Clear previous list
+                if (resumesInput.files.length > 0) {
+                    Array.from(resumesInput.files).forEach(file => {
+                        const p = document.createElement('p');
+                        p.innerHTML = `<strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                        fileListContainer.appendChild(p);
+                    });
+                    uploadButton.disabled = false; // Enable upload button
+                } else {
+                    fileListContainer.innerHTML = '<p>No files selected.</p>';
+                    uploadButton.disabled = true; // Disable upload button
+                }
+            }
+
+            // --- Function to update the displayed list of files for SINGLE EVALUATION ---
+            function updateSingleFileList() {
+                singleFileListContainer.innerHTML = ''; // Clear previous list
+                if (singleResumeInput.files.length > 0) {
+                    const file = singleResumeInput.files[0];
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    singleFileListContainer.appendChild(p);
+                    // Enable evaluate button if job description is also filled
+                    checkEvaluationFormValidity();
+                } else {
+                    singleFileListContainer.innerHTML = '<p>No file selected.</p>';
+                    evaluateButton.disabled = true;
+                }
+            }
+
+            // --- Function to check if AI Evaluation form can be submitted ---
+            function checkEvaluationFormValidity() {
+                if (jobDescriptionInput.value.trim() !== '' && singleResumeInput.files.length > 0) {
+                    evaluateButton.disabled = false;
+                } else {
+                    evaluateButton.disabled = true;
+                }
+            }
+
+            // --- Event Listeners for Bulk Upload ---
+            resumesInput.addEventListener('change', updateBulkFileList);
+
+            bulkUploadSection.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                bulkUploadSection.style.borderColor = 'var(--accent-color-recruiter)';
+                bulkUploadSection.style.backgroundColor = '#e9f5ff';
+            });
+
+            bulkUploadSection.addEventListener('dragleave', () => {
+                bulkUploadSection.style.borderColor = 'var(--primary-color-recruiter)';
+                bulkUploadSection.style.backgroundColor = 'var(--background-light)';
+            });
+
+            bulkUploadSection.addEventListener('drop', (e) => {
+                e.preventDefault();
+                bulkUploadSection.style.borderColor = 'var(--primary-color-recruiter)';
+                bulkUploadSection.style.backgroundColor = 'var(--background-light)';
+
+                if (e.dataTransfer.files.length > 0) {
+                    resumesInput.files = e.dataTransfer.files; // Assign dropped files
+                    updateBulkFileList(); // Update the list display
+                }
+            });
+
+            multiResumeUploadForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                hideAllMessages();
+
+                if (resumesInput.files.length === 0) {
+                    displayMessage(uploadMessage, 'Please select at least one resume file to upload.', 'error');
+                    return;
+                }
+
+                const files = Array.from(resumesInput.files);
+                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+                const maxSizeMB = 5; // Max file size per resume in MB
+
+                let allFilesValid = true;
+                for (const file of files) {
+                    if (!allowedTypes.includes(file.type)) {
+                        displayMessage(uploadMessage, `Invalid file type for "${file.name}". Only PDF, DOC, DOCX, or TXT are allowed.`, 'error');
+                        allFilesValid = false;
+                        break;
+                    }
+                    if (file.size > maxSizeMB * 1024 * 1024) {
+                        displayMessage(uploadMessage, `File "${file.name}" size exceeds ${maxSizeMB}MB limit.`, 'error');
+                        allFilesValid = false;
+                        break;
+                    }
+                }
+
+                if (!allFilesValid) {
+                    return;
+                }
+
+                uploadButton.disabled = true;
+                uploadButton.textContent = 'Uploading...';
+                uploadButton.style.backgroundColor = 'var(--primary-color-recruiter)';
+
+                console.log(`Simulating upload of ${files.length} resume(s)...`);
+
+                setTimeout(() => {
+                    const success = Math.random() > 0.1; // 90% success rate
+                    if (success) {
+                        // For demonstration, associate a random domain with each uploaded resume
+                        const dummyDomains = ['IT', 'Marketing', 'Finance', 'HR', 'Sales'];
+                        files.forEach(file => {
+                            const randomDomain = dummyDomains[Math.floor(Math.random() * dummyDomains.length)];
+                            uploadedResumes.push({
+                                name: file.name,
+                                domain: randomDomain,
+                                // In a real app, you'd extract content here or send to backend
+                                content: `Content of ${file.name} for ${randomDomain} domain.`,
+                                fileObject: file
+                            });
+                        });
+                        displayMessage(uploadMessage, `${files.length} resume(s) simulated upload successfully! (Backend integration needed for actual upload)`, 'success');
+                        multiResumeUploadForm.reset();
+                        updateBulkFileList();
+                        populateDomainSelect(); // Update domain filter
+                    } else {
+                        displayMessage(uploadMessage, 'Simulated upload failed. Please try again.', 'error');
+                    }
+                    uploadButton.textContent = 'Upload All Resumes';
+                    uploadButton.disabled = false;
+                    uploadButton.style.backgroundColor = 'var(--accent-color-recruiter)';
+                }, 3000);
+            });
+
+            // --- Event Listeners for AI Evaluation ---
+            singleResumeInput.addEventListener('change', updateSingleFileList);
+            jobDescriptionInput.addEventListener('input', checkEvaluationFormValidity);
+
+            evaluationSection.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                evaluationSection.style.borderColor = 'var(--accent-color-recruiter)';
+                evaluationSection.style.backgroundColor = '#e9f5ff';
+            });
+
+            evaluationSection.addEventListener('dragleave', () => {
+                evaluationSection.style.borderColor = 'var(--primary-color-recruiter)';
+                evaluationSection.style.backgroundColor = 'var(--background-light)';
+            });
+
+            evaluationSection.addEventListener('drop', (e) => {
+                e.preventDefault();
+                evaluationSection.style.borderColor = 'var(--primary-color-recruiter)';
+                evaluationSection.style.backgroundColor = 'var(--background-light)';
+
+                if (e.dataTransfer.files.length > 0) {
+                    // Only take the first file for single upload
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(e.dataTransfer.files[0]);
+                    singleResumeInput.files = dataTransfer.files;
+                    updateSingleFileList();
+                }
+            });
+
+            aiEvaluationForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                hideAllMessages();
+                predictionResult.style.display = 'none';
+
+                if (jobDescriptionInput.value.trim() === '' || singleResumeInput.files.length === 0) {
+                    displayMessage(evaluationMessage, 'Please fill in job description and upload a resume.', 'error');
+                    return;
+                }
+
+                const resumeFile = singleResumeInput.files[0];
+                const jobDescription = jobDescriptionInput.value;
+
+                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+                const maxSizeMB = 5;
+
+                if (!allowedTypes.includes(resumeFile.type)) {
+                    displayMessage(evaluationMessage, `Invalid file type. Only PDF, DOC, DOCX, or TXT are allowed.`, 'error');
+                    return;
+                }
+                if (resumeFile.size > maxSizeMB * 1024 * 1024) {
+                    displayMessage(evaluationMessage, `File size exceeds ${maxSizeMB}MB limit.`, 'error');
+                    return;
+                }
+
+                evaluateButton.disabled = true;
+                evaluateButton.textContent = 'Evaluating...';
+                evaluateButton.style.backgroundColor = 'var(--primary-color-recruiter)';
+                displayMessage(evaluationMessage, 'Sending data to AI model...', 'success');
+
+                const formData = new FormData();
+                formData.append('job_description', jobDescription);
+                formData.append('resume_file', resumeFile);
+
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+                    const simulatedDecision = Math.random() > 0.5 ? 'select' : 'reject'; // Random decision
+                    const simulatedResult = { decision: simulatedDecision };
+
+                    displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
+                    decisionText.textContent = simulatedResult.decision.toUpperCase();
+                    predictionResult.className = `prediction-result ${simulatedResult.decision}`;
+                    predictionResult.style.display = 'block';
+
+                    // Uncomment and adapt for actual backend integration
+                    /*
+                    const response = await fetch('http://127.0.0.1:5000/predict', { // IMPORTANT: Use your Flask server URL
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
+                        decisionText.textContent = result.decision.toUpperCase();
+                        predictionResult.className = `prediction-result ${result.decision}`;
+                        predictionResult.style.display = 'block';
+                    } else {
+                        displayMessage(evaluationMessage, `Error: ${result.error || 'Something went wrong.'}`, 'error');
+                    }
+                    */
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    displayMessage(evaluationMessage, 'Network error or server unavailable. Please try again later.', 'error');
+                } finally {
+                    evaluateButton.textContent = 'Evaluate Resume';
+                    evaluateButton.style.backgroundColor = 'var(--accent-color-recruiter)';
+                    checkEvaluationFormValidity();
+                }
+            });
+
+            // --- Event Listeners for Create Job Description ---
+            createJobDescriptionForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                hideAllMessages();
+
+                const title = jdTitleInput.value.trim();
+                const domain = jdDomainInput.value.trim();
+                const content = newJobDescriptionContentInput.value.trim();
+
+                if (title === '' || domain === '' || content === '') {
+                    displayMessage(jdCreationMessage, 'Please fill in all fields to create a job description.', 'error');
+                    return;
+                }
+
+                const newJD = { title, domain, content };
+                savedJobDescriptions.push(newJD);
+                displayMessage(jdCreationMessage, `Job Description "${title}" saved successfully!`, 'success');
+
+                // Clear form
+                createJobDescriptionForm.reset();
+                renderSavedJobDescriptions();
+                populateDomainSelect(); // Update domain filter with new JD's domain
+            });
+
+            function renderSavedJobDescriptions() {
+                if (savedJobDescriptions.length === 0) {
+                    savedJobDescriptionsList.innerHTML = '<h3>Saved Job Descriptions:</h3><p>No job descriptions saved yet.</p>';
+                    return;
+                }
+                let html = '<h3>Saved Job Descriptions:</h3><ul>';
+                savedJobDescriptions.forEach((jd, index) => {
+                    html += `<li><strong>${jd.title}</strong> (${jd.domain}) <button onclick="alert('Viewing content for: ${jd.title}\\n\\n${jd.content}')">View</button></li>`;
+                });
+                html += '</ul>';
+                savedJobDescriptionsList.innerHTML = html;
+            }
+
+            // --- Resumes by Domain Logic ---
+            function populateDomainSelect() {
+                domainSelect.innerHTML = '<option value="">-- Select a Domain --</option>';
+                const domains = new Set();
+                uploadedResumes.forEach(resume => domains.add(resume.domain));
+                savedJobDescriptions.forEach(jd => domains.add(jd.domain)); // Also add domains from saved JDs
+
+                Array.from(domains).sort().forEach(domain => {
+                    const option = document.createElement('option');
+                    option.value = domain;
+                    option.textContent = domain;
+                    domainSelect.appendChild(option);
+                });
+                domainSelect.disabled = domains.size === 0;
+            }
+
+            domainSelect.addEventListener('change', () => {
+                filterResumeButton.disabled = domainSelect.value === '';
+                filteredResumesList.innerHTML = '<li class="no-resumes">Select a domain and click "Show Resumes" to see results.</li>'; // Clear previous results
+                hideAllMessages();
+            });
+
+            filterResumeButton.addEventListener('click', () => {
+                hideAllMessages();
+                const selectedDomain = domainSelect.value;
+                if (!selectedDomain) {
+                    displayMessage(filteredResumesMessage, 'Please select a domain first.', 'error');
+                    return;
+                }
+
+                const resumesInDomain = uploadedResumes.filter(resume => resume.domain === selectedDomain);
+
+                filteredResumesList.innerHTML = ''; // Clear previous list
+                if (resumesInDomain.length > 0) {
+                    resumesInDomain.forEach(resume => {
+                        const li = document.createElement('li');
+                        // In a real application, you might provide a download link or a detailed view
+                        li.innerHTML = `<span>${resume.name}</span> <a href="#" onclick="alert('Simulating download/view for ${resume.name}\\n\\n${resume.content}'); return false;">View Resume</a>`;
+                        filteredResumesList.appendChild(li);
+                    });
+                    displayMessage(filteredResumesMessage, `Showing ${resumesInDomain.length} resume(s) for "${selectedDomain}" domain.`, 'success');
+                } else {
+                    filteredResumesList.innerHTML = '<li class="no-resumes">No resumes found for this domain.</li>';
+                    displayMessage(filteredResumesMessage, `No resumes found for "${selectedDomain}" domain.`, 'error');
+                }
+            });
+
+
+            // --- Helper function for displaying messages ---
+            function displayMessage(element, message, type) {
+                element.textContent = message;
+                element.className = `message ${type}`;
+                element.style.display = 'block';
+
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+
+            // Initial calls to set up the display
+            updateBulkFileList();
+            updateSingleFileList();
+            checkEvaluationFormValidity();
+            renderSavedJobDescriptions(); // Render any initially saved (or hardcoded) JDs
+            populateDomainSelect(); // Populate domain filter dropdown
+        });
+    </script>
+</body>
+</html>
