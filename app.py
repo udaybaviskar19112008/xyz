@@ -420,10 +420,10 @@ def logout():
 
 
 # Ensure the database is initialized when the app starts
-#if __name__ == '__main__':
+if __name__ == '__main__':
     from flask import g # Import g for app context setup
     init_db() # Initialize the database tables
-    app.run(debug=True) # debug=True restarts server on code changes and provides more info
+    app.run(host='0.0.0.0', port=5000, debug=True) # debug=True restarts server on code changes and provides more info
 
 
 
