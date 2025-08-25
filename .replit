@@ -2,3 +2,20 @@ modules = ["web", "python-3.12", "nodejs-20"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["glibcLocales"]
+
+[workflows]
+runButton = "Setup and Run"
+
+[[workflows.workflow]]
+name = "Setup and Run"
+author = 46862744
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m spacy download en_core_web_sm"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app.py"
