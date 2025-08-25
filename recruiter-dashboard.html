@@ -865,19 +865,24 @@
                 formData.append('resume_file', resumeFile);
 
                 try {
-                    // Simulate API call
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
-                    const simulatedDecision = Math.random() > 0.5 ? 'select' : 'reject'; // Random decision
-                    const simulatedResult = { decision: simulatedDecision };
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                    displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
-                    decisionText.textContent = simulatedResult.decision.toUpperCase();
-                    predictionResult.className = `prediction-result ${simulatedResult.decision}`;
-                    predictionResult.style.display = 'block';
+                    const result = await response.json();
 
-                    // Uncomment and adapt for actual backend integration
-                    /*
-                    const response = await fetch('http://127.0.0.1:5000/predict', { // IMPORTANT: Use your Flask server URL
+                    if (result.success) {
+                        displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
+                        const decision = result.decision.toLowerCase();
+                        decisionText.innerHTML = `${result.decision}<br><span style="font-size: 16px;">Probability: ${result.probability}%</span>`;
+                        predictionResult.className = `prediction-result ${decision}`;
+                        predictionResult.style.display = 'block';
+                    } else {
+                        displayMessage(evaluationMessage, `Error: ${result.message}`, 'error');
+                    }
+
+                    
                         method: 'POST',
                         body: formData
                     });

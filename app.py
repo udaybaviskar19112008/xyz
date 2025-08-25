@@ -5,10 +5,37 @@ import os
 import sqlite3
 from datetime import datetime
 from werkzeug.utils import secure_filename # For secure filename handling
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import re
+import spacy
+import pickle
+import pdfplumber
 
 app = Flask(__name__)
 # IMPORTANT: Change this to a strong, random key!
 app.secret_key = 'your_super_secret_key_here_for_real'
+
+# Load AI model and tokenizer
+MODEL_PATH = os.environ.get('MODEL_PATH', 'my_model.h5')
+PKL_PATH = os.environ.get('PKL_PATH', 'tokenizer_new1.pkl')
+
+try:
+    with open(PKL_PATH, 'rb') as f:
+        tokenizer = pickle.load(f)
+    keras_model = load_model(MODEL_PATH)
+    nlp = spacy.load('en_core_web_sm')
+    print("AI model loaded successfully!")
+except Exception as e:
+    print(f"Error loading AI model: {e}")
+    tokenizer = None
+    keras_model = None
+    nlp = None
+
+# AI model constants
+RESUME_LEN = 360
+JOB_LEN = 462
 
 # Database setup
 DATABASE = 'users.db'
@@ -24,6 +51,39 @@ ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# AI prediction helper functions
+def extract_text_from_pdf(pdf_file):
+    text = ""
+    with pdfplumber.open(pdf_file) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + " "
+    return text.strip()
+
+def preprocessing(text):
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = text.replace("\n", " ").strip()
+    if nlp:
+        text = [token.lemma_ for token in nlp(text) if not token.is_stop and not token.is_punct]
+        return " ".join(text)
+    return text
+
+def shorting(tokens):
+    keyword = "objective"
+    tokens_lower = [t.lower() for t in tokens]
+    if keyword in tokens_lower:
+        index = tokens_lower.index(keyword)
+        return tokens[index + 1:]
+    return tokens
+
+def text_to_vectors(text, max_len):
+    if tokenizer:
+        seq = tokenizer.texts_to_sequences([text])
+        return pad_sequences(seq, maxlen=max_len, padding='pre')
+    return None
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -303,6 +363,53 @@ def get_students():
             'resume_url': url_for('serve_resume', filename=s['resume_filename'], _external=True) if s['resume_filename'] else None
         })
     return jsonify({'success': True, 'students': student_list}), 200
+
+# --- AI Prediction Endpoint ---
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        if not keras_model or not tokenizer:
+            return jsonify({'success': False, 'message': 'AI model not loaded properly'}), 500
+        
+        # Get job description from form or JSON
+        job_description = request.form.get('job_description') or request.json.get('job_description')
+        
+        if not job_description:
+            return jsonify({'success': False, 'message': 'Job description is required'}), 400
+        
+        # Get resume file
+        resume_file = request.files.get('resume_file')
+        if not resume_file:
+            return jsonify({'success': False, 'message': 'Resume file is required'}), 400
+        
+        # Extract text from PDF
+        resume_text = extract_text_from_pdf(resume_file)
+        
+        # Preprocess texts
+        resume_clean = preprocessing(resume_text)
+        resume_clean = shorting(resume_clean.split())
+        job_clean = preprocessing(job_description)
+        
+        # Convert to vectors
+        resume_vec = text_to_vectors(" ".join(resume_clean), RESUME_LEN)
+        job_vec = text_to_vectors(job_clean, JOB_LEN)
+        
+        if resume_vec is None or job_vec is None:
+            return jsonify({'success': False, 'message': 'Error processing text'}), 500
+        
+        # Make prediction
+        prob = keras_model.predict([resume_vec, job_vec])[0][0]
+        decision = "SELECT" if prob >= 0.5 else "REJECT"
+        
+        return jsonify({
+            'success': True,
+            'probability': round(prob * 100, 2),
+            'decision': decision
+        }), 200
+        
+    except Exception as e:
+        app.logger.error(f"Error in AI prediction: {e}")
+        return jsonify({'success': False, 'message': f'Prediction error: {str(e)}'}), 500
 
 # --- Logout Route ---
 @app.route('/logout')
