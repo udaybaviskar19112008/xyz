@@ -2,7 +2,6 @@
 flask
 tensorflow
 scikit-learn
-pickle-mixin
 werkzeug
 spacy
 pdfplumber
