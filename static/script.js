@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     // Tab switching functionality
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -8,18 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const targetTab = button.dataset.tab;
-            
+
             // Update active tab button
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             // Update header animation
             if (targetTab === 'recruiter') {
                 loginHeader.classList.add('recruiter-active');
             } else {
                 loginHeader.classList.remove('recruiter-active');
             }
-            
+
             // Show corresponding form
             loginForms.forEach(form => {
                 form.classList.remove('active');
@@ -37,11 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
     studentSubTabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const targetSubTab = button.dataset.subTab;
-            
+
             // Update active sub-tab button
             studentSubTabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             // Show corresponding sub-form
             studentSubForms.forEach(form => {
                 form.classList.remove('active');
@@ -57,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (studentSignInForm) {
         studentSignInForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('studentEmail').value;
             const password = document.getElementById('studentPassword').value;
-            
+
             try {
                 const response = await fetch('/api/login-student', {
                     method: 'POST',
@@ -69,9 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({ email, password }),
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     localStorage.setItem('studentEmail', email);
                     window.location.href = '/student-dashboard.html';
@@ -90,17 +89,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (studentCreateAccountForm) {
         studentCreateAccountForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const name = document.getElementById('newStudentName').value;
             const email = document.getElementById('newStudentEmail').value;
             const password = document.getElementById('newStudentPassword').value;
             const confirmPassword = document.getElementById('confirmStudentPassword').value;
-            
+
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/register-student', {
                     method: 'POST',
@@ -109,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({ name, email, password }),
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     alert('Account created successfully! Please sign in.');
                     // Switch to sign in tab
@@ -131,10 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (recruiterForm) {
         recruiterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('recruiterEmail').value;
             const password = document.getElementById('recruiterPassword').value;
-            
+
             try {
                 const response = await fetch('/api/login-recruiter', {
                     method: 'POST',
@@ -143,9 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({ email, password }),
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     window.location.href = '/recruiter-dashboard.html';
                 } else {
@@ -157,4 +156,58 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // AI Prediction functionality for recruiter dashboard
+    function initializePredictionForm() {
+        const predictionForm = document.getElementById('predictionForm');
+        const predictionResult = document.getElementById('predictionResult');
+
+        if (predictionForm) {
+            predictionForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(predictionForm);
+                const resultDiv = document.getElementById('predictionResult');
+
+                try {
+                    resultDiv.innerHTML = '<p>Processing prediction...</p>';
+
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        resultDiv.innerHTML = `
+                            <div class="prediction-success">
+                                <h4>Prediction Result</h4>
+                                <p><strong>Decision:</strong> ${result.decision}</p>
+                                <p><strong>Match Probability:</strong> ${result.probability}%</p>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="prediction-error">
+                                <p>Error: ${result.message}</p>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Prediction error:', error);
+                    resultDiv.innerHTML = `
+                        <div class="prediction-error">
+                            <p>An error occurred during prediction. Please try again.</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+    }
+
+    // Initialize prediction form when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializePredictionForm();
+    });
 });

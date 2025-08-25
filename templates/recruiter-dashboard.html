@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -468,6 +467,83 @@
             font-style: italic;
             margin-top: 20px;
         }
+
+        /* Prediction form styles */
+        .prediction-form-container {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color-dark);
+        }
+
+        .form-group textarea,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea:focus,
+        .form-group input[type="file"]:focus {
+            border-color: var(--accent-color-recruiter);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color-recruiter);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark-recruiter);
+            transform: translateY(-2px);
+        }
+
+        .prediction-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .prediction-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .prediction-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -507,28 +583,32 @@
 
             <div class="evaluation-section" id="evaluation-section">
                 <h2 class="section-title">AI Resume Evaluation</h2>
-                <p>Upload a single resume and provide a job description to get an instant AI-powered decision.</p>
-                <form id="aiEvaluationForm">
-                    <div class="form-group">
-                        <label for="jobDescriptionInput">Job Description:</label>
-                        <textarea id="jobDescriptionInput" placeholder="Enter the full job description here..." required></textarea>
-                    </div>
+                <p>Use our AI-powered system to evaluate resumes against job descriptions.</p>
 
-                    <div class="form-group">
-                        <label for="singleResumeInput">Upload Resume (PDF, DOCX, TXT):</label>
-                        <input type="file" id="singleResumeInput" name="resume_file" accept=".pdf,.doc,.docx,.txt" required>
-                        <label for="singleResumeInput" class="file-input-label">Select Resume</label>
-                        <div class="file-list-container" id="singleFileListContainer">
-                            <p>No file selected.</p>
+                    <!-- AI Prediction Form -->
+                    <div class="prediction-form-container">
+                        <form id="predictionForm" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="job_description">Job Description:</label>
+                                <textarea id="job_description" name="job_description" rows="6" 
+                                    placeholder="Enter the job description here..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="resume_file">Resume File (PDF):</label>
+                                <input type="file" id="resume_file" name="resume_file" 
+                                    accept=".pdf" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                Analyze Resume Match
+                            </button>
+                        </form>
+
+                        <div id="predictionResult" class="prediction-result">
+                            <!-- Results will appear here -->
                         </div>
                     </div>
-
-                    <button type="submit" class="evaluate-button" disabled>Evaluate Resume</button>
-                </form>
-                <div id="evaluationMessage" class="message"></div>
-                <div id="predictionResult" class="prediction-result">
-                    AI Decision: <span id="decisionText"></span>
-                </div>
             </div>
 
             <div class="job-description-section" id="job-description-section">
@@ -589,15 +669,22 @@
             const bulkUploadSection = document.querySelector('.upload-section'); // For drag/drop
 
             // --- AI Evaluation Elements ---
-            const jobDescriptionInput = document.getElementById('jobDescriptionInput');
-            const singleResumeInput = document.getElementById('singleResumeInput');
-            const singleFileListContainer = document.getElementById('singleFileListContainer');
-            const evaluateButton = document.querySelector('.evaluate-button');
-            const aiEvaluationForm = document.getElementById('aiEvaluationForm');
-            const evaluationMessage = document.getElementById('evaluationMessage');
-            const predictionResult = document.getElementById('predictionResult');
-            const decisionText = document.getElementById('decisionText');
+            const jobDescriptionInput = document.getElementById('jobDescriptionInput'); // This is for the evaluation section, not the new prediction form
+            const singleResumeInput = document.getElementById('singleResumeInput'); // This is for the evaluation section
+            const singleFileListContainer = document.getElementById('singleFileListContainer'); // This is for the evaluation section
+            const evaluateButton = document.querySelector('.evaluate-button'); // This is for the evaluation section
+            const aiEvaluationForm = document.getElementById('aiEvaluationForm'); // This is for the evaluation section
+            const evaluationMessage = document.getElementById('evaluationMessage'); // This is for the evaluation section
+            const predictionResult = document.getElementById('predictionResult'); // This is for the new prediction form
+            const decisionText = document.getElementById('decisionText'); // This is for the evaluation section
             const evaluationSection = document.querySelector('.evaluation-section'); // For drag/drop
+
+            // New elements for the AI Prediction Form
+            const predictionForm = document.getElementById('predictionForm');
+            const predictionJobDescriptionInput = document.getElementById('job_description');
+            const predictionResumeInput = document.getElementById('resume_file');
+            const predictionResultDiv = document.getElementById('predictionResult');
+
 
             // --- Create Job Description Elements ---
             const createJobDescriptionForm = document.getElementById('createJobDescriptionForm');
@@ -637,7 +724,8 @@
 
                     // Clear messages when switching sections
                     hideAllMessages();
-                    predictionResult.style.display = 'none';
+                    predictionResultDiv.style.display = 'none'; // Hide prediction result for new form
+                    predictionResult.style.display = 'none'; // Hide old prediction result
 
                     // Re-render domain select and filtered resumes if switching to domain section
                     if (targetId === 'domain-resume-section') {
@@ -701,6 +789,28 @@
                     evaluateButton.disabled = true;
                 }
             }
+            
+            // --- Function to update file list for the NEW Prediction Form ---
+            function updatePredictionFileList() {
+                const file = predictionResumeInput.files[0];
+                if (file) {
+                    const fileNameDiv = document.createElement('p');
+                    fileNameDiv.innerHTML = `<strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    // Clear previous file name if any, and append new one
+                    const existingFileName = predictionResumeInput.parentNode.querySelector('p');
+                    if(existingFileName) existingFileName.remove();
+                    predictionResumeInput.parentNode.insertBefore(fileNameDiv, predictionResumeInput.nextSibling);
+                    
+                    // Enable prediction button if job description is also filled
+                    checkPredictionFormValidity();
+                } else {
+                    // Clear file name if input is cleared
+                    const existingFileName = predictionResumeInput.parentNode.querySelector('p');
+                    if(existingFileName) existingFileName.remove();
+                    checkPredictionFormValidity(); // Ensure button is disabled if no file
+                }
+            }
+
 
             // --- Function to check if AI Evaluation form can be submitted ---
             function checkEvaluationFormValidity() {
@@ -708,6 +818,16 @@
                     evaluateButton.disabled = false;
                 } else {
                     evaluateButton.disabled = true;
+                }
+            }
+
+            // --- Function to check if the NEW Prediction form can be submitted ---
+            function checkPredictionFormValidity() {
+                const submitButton = predictionForm.querySelector('button[type="submit"]');
+                if (predictionJobDescriptionInput.value.trim() !== '' && predictionResumeInput.files.length > 0) {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
                 }
             }
 
@@ -865,12 +985,21 @@
                 formData.append('resume_file', resumeFile);
 
                 try {
-                    const response = await fetch('/predict', {
-                        method: 'POST',
-                        body: formData
-                    });
+                    // This is a placeholder for the actual fetch call to your backend API
+                    // const response = await fetch('/evaluate-resume', { // Replace with your actual endpoint
+                    //     method: 'POST',
+                    //     body: formData
+                    // });
+                    // const result = await response.json();
+                    
+                    // Simulate a response
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+                    const result = {
+                        success: true,
+                        decision: Math.random() > 0.5 ? 'Accept' : 'Reject',
+                        probability: (Math.random() * 50 + 50).toFixed(2) // Simulate probability between 50-100
+                    };
 
-                    const result = await response.json();
 
                     if (result.success) {
                         displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
@@ -881,23 +1010,6 @@
                     } else {
                         displayMessage(evaluationMessage, `Error: ${result.message}`, 'error');
                     }
-
-                    
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        displayMessage(evaluationMessage, 'AI evaluation complete!', 'success');
-                        decisionText.textContent = result.decision.toUpperCase();
-                        predictionResult.className = `prediction-result ${result.decision}`;
-                        predictionResult.style.display = 'block';
-                    } else {
-                        displayMessage(evaluationMessage, `Error: ${result.error || 'Something went wrong.'}`, 'error');
-                    }
-                    */
                 } catch (error) {
                     console.error('Fetch error:', error);
                     displayMessage(evaluationMessage, 'Network error or server unavailable. Please try again later.', 'error');
@@ -905,6 +1017,61 @@
                     evaluateButton.textContent = 'Evaluate Resume';
                     evaluateButton.style.backgroundColor = 'var(--accent-color-recruiter)';
                     checkEvaluationFormValidity();
+                }
+            });
+
+            // --- Event Listeners for the NEW AI Prediction Form ---
+            predictionResumeInput.addEventListener('change', updatePredictionFileList);
+            predictionJobDescriptionInput.addEventListener('input', checkPredictionFormValidity);
+
+            predictionForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                hideAllMessages();
+                predictionResultDiv.style.display = 'none'; // Hide the result div
+
+                const submitButton = predictionForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Analyzing...';
+                submitButton.style.backgroundColor = 'var(--primary-color-recruiter)';
+
+                const formData = new FormData();
+                formData.append('job_description', predictionJobDescriptionInput.value);
+                formData.append('resume_file', predictionResumeInput.files[0]);
+
+                try {
+                    // Replace '/predict' with your actual backend endpoint for prediction
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // Assuming your API returns { decision: 'Accept'/'Reject', probability: number }
+                        const decision = result.decision.toLowerCase();
+                        predictionResultDiv.innerHTML = `AI Decision: <strong>${result.decision}</strong> <br> Match Score: ${result.probability}%`;
+                        predictionResultDiv.className = `prediction-result ${decision}`; // Use 'select' or 'reject' class
+                        predictionResultDiv.style.display = 'block';
+                        displayMessage(document.getElementById('evaluationMessage'), 'Analysis complete!', 'success'); // Reuse evaluation message for general feedback
+                    } else {
+                        // Handle API errors
+                        const errorMsg = result.error || 'Failed to analyze resume.';
+                        displayMessage(document.getElementById('evaluationMessage'), `Error: ${errorMsg}`, 'error');
+                        predictionResultDiv.innerHTML = 'Analysis failed.';
+                        predictionResultDiv.className = 'prediction-result prediction-error';
+                        predictionResultDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Prediction fetch error:', error);
+                    displayMessage(document.getElementById('evaluationMessage'), 'Network error. Please try again later.', 'error');
+                    predictionResultDiv.innerHTML = 'Analysis failed due to network error.';
+                    predictionResultDiv.className = 'prediction-result prediction-error';
+                    predictionResultDiv.style.display = 'block';
+                } finally {
+                    submitButton.textContent = 'Analyze Resume Match';
+                    submitButton.style.backgroundColor = 'var(--accent-color-recruiter)';
+                    checkPredictionFormValidity(); // Re-enable button if valid, or keep disabled if not
                 }
             });
 
@@ -1010,6 +1177,9 @@
             checkEvaluationFormValidity();
             renderSavedJobDescriptions(); // Render any initially saved (or hardcoded) JDs
             populateDomainSelect(); // Populate domain filter dropdown
+            
+            // Initial check for the new prediction form
+            checkPredictionFormValidity();
         });
     </script>
 </body>
