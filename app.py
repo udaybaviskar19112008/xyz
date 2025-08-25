@@ -13,7 +13,7 @@ import spacy
 import pickle
 import pdfplumber
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 # IMPORTANT: Change this to a strong, random key!
 app.secret_key = 'your_super_secret_key_here_for_real'
 
